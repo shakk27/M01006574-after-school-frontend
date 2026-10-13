@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After-School Activities - M01006574</title>
+    <!-- Vue 3 Production CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Pastel Pink Styling -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div>
+                <h1>{{ storeName }}</h1>
+                <p class="student-id">Student ID: M01006574</p>
+            </div>
+            <button @click="toggleCheckout" :disabled="cart.length === 0">
+                <i class="fa-solid fa-cart-shopping"></i> Checkout ({{ cartItemCount }})
+            </button>
+        </header>
+
+        <main>
+            <!-- Lesson View -->
+            <div v-if="currentView === 'lessons'">
+                <div class="controls">
+                    <input type="text" v-model="searchQuery" placeholder="Search activities or locations...">
+                    <select v-model="sortBy">
+                        <option value="subject">Subject</option>
+                        <option value="location">Location</option>
+                        <option value="price">Price</option>
+                        <option value="availability">Spaces</option>
+                    </select>
+                    <button @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'">
+                        {{ sortOrder === 'asc' ? 'Ascending' : 'Descending' }}
+                    </button>
+                </div>
+
+                <div class="lesson-grid">
+                    <div v-for="lesson in sortedLessons" :key="lesson._id" class="lesson-card">
+                        <i :class="lesson.icon" class="lesson-icon"></i>
+                        <h3>{{ lesson.subject }}</h3>
+                        <p><strong>Location:</strong> {{ lesson.location }}</p>
+                        <p><strong>Price:</strong> £{{ lesson.price }}</p>
+                        <p><strong>Spaces:</strong> {{ lesson.availableSpaces }}</p>
+                        <button @click="addToCart(lesson)" :disabled="lesson.availableSpaces === 0">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkout View -->
+            <div v-else class="checkout-view">
+                <h2>Shopping Cart</h2>
+                <div v-if="cart.length === 0">Your cart is empty.</div>
+                <div v-else class="cart-list">
+                    <div v-for="(item, index) in cart" :key="index" class="cart-item">
+                        <span>{{ item.subject }} - £{{ item.price }}</span>
+                        <button @click="removeFromCart(index)">Remove</button>
+                    </div>
+                </div>
+
+                <h2>Checkout Details</h2>
+                <form @submit.prevent="submitOrder" class="checkout-form">
+                    <input type="text" v-model.trim="order.name" placeholder="Name (Letters only)">
+                    <input type="text" v-model.trim="order.phone" placeholder="Phone (Numbers only)">
+                    <button type="submit" :disabled="!isFormValid">Place Order</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
